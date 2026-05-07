@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Exam13 - Anti Nyontek by RyzziCyber</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --text: #1e293b;
+      --green: #008e8a;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 50px 20px 20px;
+      color: var(--text);
+      user-select: none; /* Mencegah copy paste */
+    }
+
+    .logo {
+      width: 130px;
+      margin-bottom: 35px;
+    }
+
+    .main-title {
+      font-size: 18px;
+      font-weight: 300;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .year-title {
+      font-size: 18px;
+      font-weight: 300;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 40px;
+    }
+
+    .input-group {
+      width: 90%;
+      max-width: 380px;
+      margin-bottom: 30px;
+    }
+
+    .input-token {
+      width: 100%;
+      padding: 15px 20px;
+      text-transform: uppercase;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      border: 2px solid #00b4ae;
+      border-radius: 25px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .input-token:focus {
+      border-color: #00b4ae;
+      box-shadow: 0 0 0 5px rgba(0, 180, 174, 0.2);
+    }
+
+    .info {
+      font-size: 15px;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 50px;
+    }
+
+    .btn {
+      width: 70%;
+      max-width: 380px;
+      padding: 16px;
+      background: var(--green);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #006d68;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0, 141, 138, 0.35);
+    }
+
+    .foot {
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.6;
+      margin-top: 50px;
+    }
+
+    /* Loading Screen */
+    #loading {
+      position: fixed; inset: 0; background: white;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; font-size: 16px; font-weight: 600; color: var(--primary);
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid var(--green);
+      border-radius: 50%; animation: spin 1s linear infinite; margin-top: 15px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Modal Error */
+    .modal { 
+      display: none; 
+      position: fixed; inset: 0; 
+      background: rgba(0,0,0,0.6); 
+      backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; 
+      z-index: 9999; 
+    }
+    .modal-content {
+      background: white; 
+      padding: 40px 30px; 
+      border-radius: 20px; 
+      text-align: center;
+      max-width: 340px; width: 90%; 
+      border: 3px solid #ef4444;
+    }
+    .modal h2 { color: #dc2626; margin-bottom: 10px; }
+    .close-btn { 
+      margin-top: 20px; padding: 10px 30px; 
+      background: #ef4444; color: white; 
+      border: none; border-radius: 50px; font-weight: 600; cursor: pointer; 
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div>Menghubungkan ke Database...</div>
+    <div class="spinner"></div>
+  </div>
+
+  <img src="https://iili.io/fzd1Ma2.png" alt="Logo Sekolah" class="logo">
+
+  <div class="main-title">Sumatif Akhir Semester Ganjil</div>
+  <div class="year-title">Tahun Pelajaran 2025/2026</div>
+
+  <div class="input-group">
+    <input type="text" id="kodeInput" class="input-token" placeholder="INPUT TOKEN SOAL" autocomplete="off">
+  </div>
+
+  <div class="info">
+    Silahkan input Token Soal sesuai arahan<br>dari Panitia/Pengawas
+  </div>
+
+  <button class="btn" onclick="verifikasiKode()" id="btnCek">CEK TOKEN</button>
+
+  <div class="foot">
+    S-Code by : ICT SMPN 13 - with Baso Asril
+  </div>
+
+  <div id="errorModal" class="modal">
+    <div class="modal-content">
+      <h2>Token Salah!</h2>
+      <p>Token tidak ditemukan atau sudah kadaluarsa. Silakan hubungi pengawas.</p>
+      <button class="close-btn" onclick="closeModal()">TUTUP</button>
+    </div>
+  </div>
+
+  <script>
+    // GANTI DENGAN URL APPS SCRIPT ANDA
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxjvI5jBpQgeuoI61S3TgCIWxrHPerjBfedrJZazBNvzAinp2oNIQGgVn-_XmQcdfGI/exec';
+    
+    let daftarKode = {};
+
+    // Ambil Data dari Cloud (Spreadsheet)
+    async function loadDatabase() {
+      try {
+        const response = await fetch(`${API_URL}?t=${Date.now()}`);
+        if (!response.ok) throw new Error();
+        daftarKode = await response.json();
+      } catch (err) {
+        alert("Gagal terhubung ke database. Pastikan internet aktif.");
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('kodeInput').focus();
+      }
+    }
+
+    // Verifikasi Token
+    function verifikasiKode() {
+      const btn = document.getElementById('btnCek');
+      const input = document.getElementById('kodeInput').value.trim().toUpperCase();
+
+      if (!input) {
+        showError();
+        return;
+      }
+
+      // Cari URL di database
+      const targetUrl = daftarKode[input];
+
+      if (targetUrl) {
+        btn.innerHTML = "MENGALIHKAN...";
+        btn.style.opacity = "0.7";
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '0';
+        
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 500);
+      } else {
+        showError();
+      }
+    }
+
+    function showError() {
+      document.getElementById('errorModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('errorModal').style.display = 'none';
+      document.getElementById('kodeInput').value = "";
+      document.getElementById('kodeInput').focus();
+    }
+
+    // Enter Key Support
+    document.getElementById('kodeInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') verifikasiKode();
+    });
+
+    // Jalankan Load Database
+    loadDatabase();
+
+    // Proteksi Sederhana
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+      }
+    };
+  </script>
+</body>
+</html>
